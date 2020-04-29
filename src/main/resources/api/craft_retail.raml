@@ -1,0 +1,267 @@
+#%RAML 1.0
+title: Api Documentation
+description: Api Documentation
+version: 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/163e2bf5-3ac2-4b3e-9142-3248831eec9b/licenses/LICENSE-2.0 # baseUri:  http://www.apache.org/licenses/LICENSE-2.0
+traits:
+  collection:
+    responses:
+      401:
+        description: Bad Credentials        
+      403:
+        description: Forbidden           
+/product:
+  get:
+    description: View a specific product
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include getProducts.json
+      404: 
+        description: Not Found 
+  is:  [collection]      
+  post:  
+    description: Create a new Product
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include postProducts.json              
+      201:
+        description: Created
+      404: 
+        description: Not Found
+    is:  [collection] 
+         
+  /ID:
+    get:
+      description: View a specific product
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+               [{"id": 1,
+                "barCodeId":
+                "ABC-abc-0001",
+                "name": "Tomato",
+                "ProductCategory": "A",
+                "rate": 20},]
+        404: 
+          description: product does not exist
+      is: [collection]    
+    put:
+      description: Update existing Product
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include update.json          
+        201:
+          description: Created
+        404:
+          description: Not Found
+      is: [collection]             
+    delete:   
+      description: delete existing Product  
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include delete.json
+        204: 
+          description: No Content   
+      is: [collection]   
+
+/bill:
+    
+ get:
+   description: fetches all bills from the database
+   responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include getBills.json
+      404:
+        description: Not Found
+ post: 
+  description: Creates an Bill and returns an id.
+  responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include postBills.json
+      201:
+        description: Created
+      404: 
+        description: Not Found   
+  is: [collection]   
+ /ID:
+   get:
+     description: fetches a particular bill details
+     responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include getBill.json
+        404:
+          description: Bill Not Found
+     is: [collection]            
+   put:
+     description: Add or Remove products from the Bill
+     responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include update.json
+        201:
+          description: Created
+        404:
+          description: Data Validation error 
+     is: [collection]   
+   delete:
+     description: Deletes Bill
+     responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include delete.json
+        204:
+          description: No Content
+        404:
+          description: Bill does not exist
+     is: [collection]
+types:
+  bills:
+    type: object
+    properties:
+      billStatus:
+        type: string
+        enum: [IN_PROGRESS, RELEASED]          
+      id:
+        type: integer
+        format: int64
+      lineItems:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            product:
+              type: object
+              properties:
+                barCodeId:
+                  type: string
+                id:
+                  type: integer
+                  format: int64
+                name:
+                  type: string
+                productCategory:
+                  type: string
+                  enum:
+                    - A
+                    - B
+                    - C
+                rate:
+                  type: number
+                  format: double
+            quantity: 
+                  type: integer
+                  format: int64    
+      noOfItems:
+        type: integer
+        format: int32
+      totalCost:
+        type: number
+        format: double
+      totalTax:
+        type: number
+        format: double
+      totalValue:
+        type: number
+        format: double 
+/productCatagory:
+  get:
+    description: View all product catagory
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+             [ {
+                "id":"1",
+                "name":"watermillon"
+              },
+              {
+                "id":"2",
+                "name":"banana"
+              }]
+      404: 
+        description: Not Found 
+  /ID:
+    get:
+      description: View a specific product by there catagory 
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+               [{
+                "id":"2",
+                "name":"banana"
+              }]
+        404: 
+          description: product catagory does not exist
+    
+  post:  
+    description: Create a new Product Catagory
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include postProducts.json              
+      201:
+        description: Created
+      404: 
+        description: Not Found 
+  put:
+     description: Update product catagory
+     responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include update.json
+        201:
+          description: Created
+        404:
+          description: Data Validation error 
+     is: [collection]   
+  delete:
+     description: Deletes Product catagory
+     responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include delete.json
+        204:
+          description: No Content
+        404:
+          description: Catagory does not exist
+                       
+

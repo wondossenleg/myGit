@@ -1,0 +1,1 @@
+{"billStatus": "IN_PROGRESS", "id": 0, "lineItems": [ { "id": 0, "product": { "barCodeId": "string", "id": 0, "name": "string", "productCategory": "A", "rate": 0 }, "quantity": 0 } ], "noOfItems": 0, "totalCost": 0, "totalTax": 0, "totalValue": 0     }

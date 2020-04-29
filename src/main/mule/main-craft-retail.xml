@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="getAllProducts" doc:id="7001d08d-9c43-4c59-a3a2-1fa377f81cb0" >
+		<http:listener doc:name="Listener" doc:id="75f20ffb-4e1e-437b-bb54-0532e8a32abb" config-ref="craft_retail-httpListenerConfig" path="/getAllProducts"/>
+		<flow-ref doc:name="Flow Reference" doc:id="a19695f1-e323-4ee0-839c-0d5f702a5f33" name="get:\product:craft_retail-config"/>
+	</flow>
+	<flow name="updateProduct" doc:id="d38af371-da90-40ba-851d-891075f367cc" >
+		<http:listener doc:name="Listener" doc:id="4f28fd30-7be2-4490-b504-2ea81912a341" config-ref="craft_retail-httpListenerConfig" path="/updateProduct"/>
+		<flow-ref doc:name="Flow Reference" doc:id="3251c3df-9b13-4912-8804-945561cde23b" name="put:\product\ID:craft_retail-config"/>
+	</flow>
+	<flow name="getAllBills" doc:id="91c629aa-2554-4400-8d66-904d3ab371e7" >
+		<http:listener doc:name="Listener" doc:id="0cfc69cd-1e5c-4ac3-a91b-7044434a142a" config-ref="craft_retail-httpListenerConfig" path="/getAllBills"/>
+		<flow-ref doc:name="Flow Reference" doc:id="e91980f5-22f4-4b93-a066-8981352854bd" name="get:\bill:craft_retail-config"/>
+	</flow>
+	<flow name="getProduct" doc:id="1bd095a3-7ad3-4dcf-966c-ecfad3b7e38b" >
+		<http:listener doc:name="Listener" doc:id="810e7b0c-3be4-4514-ad0e-b7adcc8a8671" config-ref="craft_retail-httpListenerConfig" path="/getProduct"/>
+		<flow-ref doc:name="Flow Reference" doc:id="b6e05206-ac86-4e93-a005-10b73b1026bd" name="get:\product\ID:craft_retail-config"/>
+	</flow>
+	<flow name="deleteProduct" doc:id="e83b0401-094c-414b-9121-998b48d2cf5f" >
+		<http:listener doc:name="Listener" doc:id="80a9184a-7d41-486b-9be5-26ef84cdcbdb" config-ref="craft_retail-httpListenerConfig" path="deleteProduct"/>
+		<flow-ref doc:name="Flow Reference" doc:id="d707483d-fa85-40cb-9233-2060c4777e4c" name="delete:\product\ID:craft_retail-config"/>
+	</flow>
+	<flow name="createBill" doc:id="d69e20d9-2028-47d8-8756-46456a13106b" >
+		<http:listener doc:name="Listener" doc:id="0a04cb46-6560-4e14-abde-0e15e7bfb4a9" config-ref="craft_retail-httpListenerConfig" path="/createBill"/>
+		<flow-ref doc:name="Flow Reference" doc:id="0a254578-2d05-4e5e-80ed-56d1b060ccd1" name="post:\bill:craft_retail-config"/>
+	</flow>
+	<flow name="createProduct" doc:id="ef0d8c99-290e-4692-a1c0-f6f3cca9853f" >
+		<http:listener doc:name="Listener" doc:id="02e57d9a-f256-463c-bf97-9cd3505ff06b" config-ref="craft_retail-httpListenerConfig" path="/createProduct"/>
+		<flow-ref doc:name="Flow Reference" doc:id="0404d5ef-aa73-412e-9d18-cf8c630c91ae" name="post:\product:craft_retail-config"/>
+	</flow>
+	<flow name="getBill" doc:id="aea13d9c-11af-478f-9e97-2f21495e0755" >
+		<http:listener doc:name="Listener" doc:id="2194cb53-1c6d-41cb-aab2-271d4bf89823" config-ref="craft_retail-httpListenerConfig" path="/getBill"/>
+		<flow-ref doc:name="Flow Reference" doc:id="9721d3d9-dcf2-4802-9c75-5eeb7f44eb5c" name="get:\bill\ID:craft_retail-config"/>
+	</flow>
+	<flow name="updateBill" doc:id="3109432a-a784-4426-9e82-83381e8772ce" >
+		<http:listener doc:name="Listener" doc:id="b16988af-6d28-4da4-b423-06bd61d7e946" config-ref="craft_retail-httpListenerConfig" path="/updateBill"/>
+		<flow-ref doc:name="Flow Reference" doc:id="f388a55e-b771-4b77-883b-464cc73d0ecd" name="put:\bill\ID:craft_retail-config"/>
+	</flow>
+	<flow name="deleteBill" doc:id="9303d150-4328-4142-b930-1f13c0f0ef85" >
+		<http:listener doc:name="Listener" doc:id="d801917f-6cd8-44f8-ab0f-9d0c0168552c" config-ref="craft_retail-httpListenerConfig" path="/deleteBill"/>
+		<flow-ref doc:name="Flow Reference" doc:id="f8528dc9-775e-4791-b5a7-bbfb78e8981d" name="delete:\bill\ID:craft_retail-config"/>
+	</flow>
+	<flow name="createProductCatagory" doc:id="5ad5aae8-a1e5-430e-ad01-1a208183b8cf" >
+		<http:listener doc:name="Listener" doc:id="6c44a8a7-f468-4d86-8e6d-fa99e7ca44a7" config-ref="craft_retail-httpListenerConfig" path="/createProductCatagory"/>
+		<flow-ref doc:name="Flow Reference" doc:id="8473046d-e6e8-4de0-ad36-65ec453e2e62" name="post:\productCatagory:craft_retail-config"/>
+	</flow>
+	<flow name="getAllProductCatagory" doc:id="bce4cae7-9c4e-4ffc-86bc-bb9843d8b511" >
+		<http:listener doc:name="Listener" doc:id="6afabcd7-26f2-484c-834c-72904bfe5782" config-ref="craft_retail-httpListenerConfig" path="/getAllProductCatagory"/>
+		<flow-ref doc:name="Flow Reference" doc:id="50689d1b-976b-4b01-b0a6-35f246580339" name="get:\productCatagory:craft_retail-config"/>
+	</flow>
+	<flow name="getProductCatagory" doc:id="355e1a3d-b4ad-4619-b745-d6cf69c4c993" >
+		<http:listener doc:name="Listener" doc:id="d5e7f514-ce3d-4f74-bd75-3104f1c94847" config-ref="craft_retail-httpListenerConfig" path="/getProductCatagory"/>
+		<flow-ref doc:name="Flow Reference" doc:id="2f40101f-f280-4e68-aa65-ef3988e55671" name="get:\productCatagory\ID:craft_retail-config"/>
+	</flow>
+	<flow name="deleteProductCatagory" doc:id="14e04367-4478-48b1-b867-399657cdc4f6" >
+		<http:listener doc:name="Listener" doc:id="0964f5b7-e100-4c01-a1cb-a0fdcd40cdeb" config-ref="craft_retail-httpListenerConfig" path="/deleteProductCatagory"/>
+		<flow-ref doc:name="Flow Reference" doc:id="869e961f-2e5a-43fe-9cbb-ebb145a40e31" name="delete:\productCatagory:craft_retail-config"/>
+	</flow>
+	<flow name="updateProductCatagory" doc:id="fcb74fc6-b8fc-4047-8b7d-2c56514b55d2" >
+		<http:listener doc:name="Listener" doc:id="992baa9e-10c2-46ef-87be-eead937e7a58" config-ref="craft_retail-httpListenerConfig" path="/updateProductCatagory"/>
+		<flow-ref doc:name="Flow Reference" doc:id="13c9b738-6462-4839-ab1e-841e43277963" name="put:\productCatagory:craft_retail-config"/>
+	</flow>
+</mule>

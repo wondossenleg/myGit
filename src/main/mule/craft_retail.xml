@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+    <http:listener-config name="craft_retail-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="craft_retail-config" raml="craft_retail.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="f43e7aaf-e0c0-4bfa-8ff8-fe61fa1ca67f">
+        <wsc:connection wsdlLocation="http://dev.icraftsoft.net:8093/ws/retail.wsdl" service="RetailPortService" port="RetailPortSoap11" address="http://dev.icraftsoft.net:8093/ws" />
+    </wsc:config>
+    <flow name="craft_retail-main">
+        <http:listener config-ref="craft_retail-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="craft_retail-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="craft_retail-console">
+        <http:listener config-ref="craft_retail-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="craft_retail-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\bill\ID:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="38e16519-2e50-46e6-a743-8300756bab07" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="24f77291-b4e2-4ccc-8270-de205df23063">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: vars.varsID
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="25b8d6d2-466c-48fd-9704-e70eddcafca2">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#UpdateBillRequest: {
+		ns0#Bill: {
+//			ns0#id: payload.id,
+			ns0#noOfItems: payload.noOfItems,
+			ns0#totalCost: payload.totalCost,
+			ns0#totalTax: payload.totalTax,
+			ns0#totalValue: payload.totalValue
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="d5ad61ee-e84f-40c4-ac94-ee028041d3ad" config-ref="Web_Service_Consumer_Config" operation="UpdateBill" />
+        <ee:transform doc:name="Transform Message" doc:id="08497348-9962-40fe-89db-fb66f10c2e73">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+[
+  {
+    message: "Bill Updated Successfully"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\product\ID:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="6890bf87-d28d-4d2b-a366-6f411942e1d4" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="66ed5d97-668f-443a-9cce-76df2d7a2482">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: vars.varsID
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message" doc:id="621c82a7-ec12-406b-867d-b0f47654d177">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#UpdateProductRequest: {
+		ns0#Product: {
+//			ns0#id: payload.id,
+			ns0#name: payload.name,
+			ns0#barcode: payload.barcode,
+			ns0#rate: payload.rate,
+			ns0#productCategory: payload.productCategory
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="b4d854f0-4bd4-48c7-97c4-82cb52ba4ace" config-ref="Web_Service_Consumer_Config" operation="UpdateProduct" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="c73b11bb-da47-42f8-9810-6c46ecb6a10a">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    message: "Product Updated Successfully"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="delete:\bill\ID:craft_retail-config">
+        <http:listener doc:name="Listener" doc:id="ce9f96d8-d7e2-43c5-9ec3-ff00910552d3" config-ref="craft_retail-httpListenerConfig" path="/deleteBill" />
+        <flow-ref doc:name="Flow Reference" doc:id="9aab9ea1-4a10-487b-ac60-4f117fc335f5" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="f496795a-f961-45cc-b0ee-a6dbd9192107">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#DeleteBillRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="b5bb288e-2180-41f8-b428-d74d53d04a87" config-ref="Web_Service_Consumer_Config" operation="DeleteBill" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="0a9d14ef-6a36-433d-9d63-dbce380af716">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    message: "Bill Info Deleted Successfully"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="delete:\product\ID:craft_retail-config">
+        <http:listener doc:name="Listener" doc:id="eaebdfd3-23a5-4350-a54f-013609643130" config-ref="craft_retail-httpListenerConfig" path="/deleteProduct" />
+        <flow-ref doc:name="Flow Reference" doc:id="c14eece6-fa7a-46c8-ae14-5fe094139a37" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="1da9ad05-d108-4ef3-b7c5-4355257e9831">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#DeleteProductRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="5fd38d06-bd1e-4456-a020-850318fa66be" config-ref="Web_Service_Consumer_Config" operation="DeleteProduct" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="5445fb80-d2f7-41e6-a3b2-7e1f5e6743d3">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    message: "Product Info Deleted Successfully"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="ID" doc:id="ea979204-cdde-4cbe-b5f6-4fdbf1602930">
+        <set-variable value="#[attributes.queryParams.id]" doc:name="Set Variable" doc:id="341c7c84-d6a0-494b-b110-11771c54e1e1" variableName="varsID" />
+    </flow>
+    <flow name="get:\product\ID:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="23cdc0bf-9ee1-42fc-9e45-234b12bbbca4" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="b6446a76-5cd6-43ec-930c-97f92bafb0f7">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetProductRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:id="9d5c0117-7910-442c-ae00-7f3ffe56a21e" config-ref="Web_Service_Consumer_Config" operation="GetProduct" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="c904a652-0ce8-4274-b4d3-96b528a1aafb">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+payload.body.ns0#GetProductResponse]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\bill\ID:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="da80c0ea-6933-4f47-b19a-887cfd8defb4" name="ID" />
+        <ee:transform doc:name="Transform Message" doc:id="618f55b1-ade2-4163-978c-17fd761eb727">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetBillRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="7489607b-51bf-4b9c-b2dc-f860de63883c" config-ref="Web_Service_Consumer_Config" operation="GetBill" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="81c71bb5-94fb-4f2c-a5fa-641ad5bb0542">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\bill:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="568fac1b-be3a-46e2-a54f-3f4cc90bd897">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetAllBillsRequest: payload
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="d5d9fe8a-b5d9-45bd-ba5c-c57fe4fa49ca" config-ref="Web_Service_Consumer_Config" operation="GetAllBills" />
+        <ee:transform doc:name="Transform Message" doc:id="171ef882-3589-48e9-b6d0-7311dfc25a82">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+payload.body.ns0#GetAllBillsResponse]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\product:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="af47284e-6973-409f-b965-e915e11dddde">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetAllProductsRequest: payload
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume doc:name="Consume" doc:id="f2eeaf30-06d3-4cb9-b6a5-4d3c0093cc9d" config-ref="Web_Service_Consumer_Config" operation="GetAllProducts" />
+        <ee:transform doc:name="Transform Message" doc:id="1d69929b-39ef-45fa-b0bd-8c4ef384630e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+payload.body.ns0#GetAllProductsResponse]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\bill:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="b2e30ca5-8c95-490a-afef-d45404611778">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#CreateBillRequest: {
+		ns0#CreateBill: {
+//			ns0#id: payload.id,
+			ns0#noOfItems: payload.noOfItems,
+			ns0#totalCost: payload.totalCost,
+			ns0#totalTax: payload.totalTax,
+			ns0#totalValue: payload.totalValue
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume operation="CreateBill" doc:name="Consume" doc:id="b3aa1e97-ed8c-4c31-8b09-3addfe860d4b" config-ref="Web_Service_Consumer_Config" />
+        <ee:transform doc:name="Transform Message" doc:id="31773fa3-e9bc-4cae-9789-ade58cddc98b">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Message: "Bill Created"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\product:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="97fc0403-732d-4656-bbfe-e7043c67b439">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#CreateProductRequest: {
+		ns0#CreateProduct: {
+			ns0#id: payload.id,
+			ns0#name: payload.name,
+			ns0#barcode: payload.barcode,
+			ns0#rate: payload.rate,
+			ns0#productCategory: payload.productCategory
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <wsc:consume operation="CreateProduct" doc:name="Consume" doc:id="5b957d5e-ac5e-449f-a76c-ff2ce4133325" config-ref="Web_Service_Consumer_Config" />
+        <ee:transform doc:name="Transform Message" doc:id="1dc8acd9-60c1-4b9f-a38a-ff14a750bac1">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Message: "Product Created"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\productCatagory:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="594319bf-3d04-4f45-8d55-849aae97915a" name="ID"/>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="33bb336f-2d68-4760-9677-a5efe6c7a62f">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#UpdateProductRequest: {
+		ns0#Product: {
+//			ns0#id: null,
+			ns0#name: payload.name,
+			ns0#barcode: payload.barcode,
+			ns0#rate: payload.rate,
+			ns0#productCategory: payload.productCategory
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="a318b87c-7884-4b13-9d07-68b868c8d4a6" config-ref="Web_Service_Consumer_Config" operation="UpdateProduct"/>
+		<ee:transform doc:name="Transform Message" doc:id="ad1c9023-ad0f-4ad3-beea-3e66128ca650" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "product Catagorey Updated"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="delete:\productCatagory:craft_retail-config">
+        <flow-ref doc:name="Flow Reference" doc:id="402c15b6-22e7-4d66-8428-2cc2d0eded35" name="ID"/>
+		<ee:transform doc:name="Transform Message" doc:id="bbd30356-64d9-4070-979c-7104016a77eb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#DeleteProductCategoryRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="DeleteProductCategory" doc:name="Consume" doc:id="05841fb7-a0f9-45c9-b737-ec488d6d3396" config-ref="Web_Service_Consumer_Config"/>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ec7f79c0-0f00-4cc7-9390-6a375a599cc5">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    message: "Product Catagory Deleted Successfully"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\productCatagory\ID:craft_retail-config">
+		<flow-ref doc:name="Flow Reference" doc:id="2c0ce614-9dce-441b-83ce-845333a97381" name="ID"/>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="fbd127fc-8989-479b-aefc-f53b43b6d9cc">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetProductCategoryRequest: {
+		ns0#id: vars.varsID
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="220e9c4b-03e4-4f91-88c9-068094747c02" config-ref="Web_Service_Consumer_Config" operation="GetProductCategory"/>
+		<ee:transform doc:name="Transform Message" doc:id="203b798f-82b6-4687-8f4f-9e8d5c461a19" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+payload.body.ns0#GetProductCategoryResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="get:\productCatagory:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="d5b7ea97-4d86-44f9-ae45-8f72b7c4aadc">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#GetAllProductCategorysRequest: payload
+}
+  ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="1982f2f7-4fbf-41f6-8e3c-8d307a261ce5" config-ref="Web_Service_Consumer_Config" operation="GetAllProductCategorys"/>
+		<ee:transform doc:name="Transform Message" doc:id="d5aa69ab-93e3-4e8b-a6ee-7b67dfbb4508" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://www.craftsoftware.com/retail
+---
+payload.body.ns0#GetAllProductCategorysResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="post:\productCatagory:craft_retail-config">
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="8a3ed422-33b8-402f-8a09-24bbb1fd8273">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.craftsoftware.com/retail
+---
+{
+	ns0#CreateProductCategoryRequest: {
+		ns0#CreateProductCategory: {
+//			ns0#id: payload.id,
+			ns0#name: payload.name
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<wsc:consume operation="CreateProductCategory" doc:name="Consume" doc:id="8d4ababb-114d-4fce-b929-6163b92450dc" config-ref="Web_Service_Consumer_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="da519fa8-cf25-432b-8bcc-414619343ddf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Product Catagory Created "
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+</mule>

@@ -1,0 +1,12 @@
+        [ 
+                {"id": 1, "barCodeId": "ABC-abc-0001", "name": "Tomato", "ProductCategory": "A", "rate": 20},
+                { "id": 2, "barCodeId": "ABC-abc-0002", "name": "Onion", "productCategory": "B", "rate": 30 },
+                { "id": 3, "barCodeId": "ABC-abc-0003", "name": "Potato", "productCategory": "C", "rate": 40 },
+                { "id": 4, "barCodeId": "ABC-abc-0004", "name": "Bread", "productCategory": "A", "rate": 50 }, 
+                { "id": 5, "barCodeId": "ABC-abc-0005", "name": "Apples", "productCategory": "B", "rate": 60 },
+                { "id": 6, "barCodeId": "ABC-abc-0006", "name": "Banana", "productCategory": "C", "rate": 70 },
+                { "id": 7, "barCodeId": "ABC-abc-0007", "name": "Strawberry", "productCategory": "A", "rate": 80 },
+                { "id": 8, "barCodeId": "ABC-abc-0008", "name": "Apricot", "productCategory": "B", "rate": 90 },
+                { "id": 9, "barCodeId": "ABC-abc-0009", "name": "Raisins", "productCategory": "C", "rate": 100 },
+                { "id": 10, "barCodeId": "ABC-abc-0010", "name": "CashewNut", "productCategory": "A", "rate": 110 }
+        ]
